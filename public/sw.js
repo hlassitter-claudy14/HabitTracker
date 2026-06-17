@@ -1,7 +1,9 @@
 // Minimal service worker for an installable, offline-capable PWA shell.
 // The app's data lives in LocalStorage, so we only need to cache the app shell.
 const CACHE = 'habits-shell-v1';
-const APP_SHELL = ['/', '/index.html', '/manifest.webmanifest', '/icon.svg'];
+// Scope-relative so the same SW works at the domain root or under a Pages subpath.
+const BASE = new URL('./', self.location).pathname;
+const APP_SHELL = [BASE, `${BASE}index.html`, `${BASE}manifest.webmanifest`, `${BASE}icon.svg`];
 
 self.addEventListener('install', (event) => {
   event.waitUntil(caches.open(CACHE).then((cache) => cache.addAll(APP_SHELL)));
@@ -23,7 +25,7 @@ self.addEventListener('fetch', (event) => {
 
   // Network-first for navigations so deploys aren't stale; fall back to cache offline.
   if (request.mode === 'navigate') {
-    event.respondWith(fetch(request).catch(() => caches.match('/index.html')));
+    event.respondWith(fetch(request).catch(() => caches.match(`${BASE}index.html`)));
     return;
   }
 

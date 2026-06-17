@@ -12,7 +12,9 @@ ReactDOM.createRoot(document.getElementById('root')).render(
 // Register the service worker for PWA / offline support (production only).
 if ('serviceWorker' in navigator && import.meta.env.PROD) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/sw.js').catch(() => {
+    // Resolve relative to the deployed base (works at root or under a Pages subpath).
+    const swUrl = `${import.meta.env.BASE_URL}sw.js`;
+    navigator.serviceWorker.register(swUrl).catch(() => {
       /* Registration failures are non-fatal — the app still works online. */
     });
   });
